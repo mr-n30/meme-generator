@@ -3,8 +3,9 @@ import { useState, useEffect } from "react"
 export default function Main() {
   const [memeText, setMemeText] = useState({top: "Shut up", bottom: "and take my money!"})
   const [memeUrl, setMemeUrl] = useState("")
-  const [id, setId] = useState(99)
+  const [id, setId] = useState(0)
   const [memeUrlLength, setMemeUrlLength] = useState(0)
+  const [altText, setAltText] = useState("")
 
   function handleChange(event) {
     const {value, name} = event.currentTarget
@@ -18,9 +19,12 @@ export default function Main() {
   useEffect(function() {
     fetch("https://api.imgflip.com/get_memes")
       .then(res => res.json())
-      .then(data => {
-        setMemeUrlLength(data.data.memes.length)
-        return setMemeUrl(data.data.memes[id].url)
+      .then(({ data }) => {
+        setMemeUrlLength(data.memes.length)
+        setMemeUrl(() => {
+          setAltText(data.memes[id].name)
+          return data.memes[id].url
+        })
       })
   }, [id])
 
@@ -28,22 +32,20 @@ export default function Main() {
     setId(prev => {
       if (prev < memeUrlLength - 1)
         return prev + 1
-      else
-        return prev
+      return prev
     })
   }
 
   function previousImage() {
     setId(prev => {
-      if (prev > 1)
+      if (prev > 0)
         return prev - 1
-      else
-        return prev
+      return prev
     })
   }
 
   function randomMeme() {
-    setId(Math.floor(Math.random() * (99 - 1 + 1)) + 1)
+    setId(Math.floor(Math.random() * (99 - 0 + 1)) + 0)
   }
 
   return (
@@ -70,7 +72,7 @@ export default function Main() {
       <div className="meme-image-container">
         <span className="top">{memeText.top}</span>
         <span className="bottom">{memeText.bottom}</span>
-        <img src={memeUrl} alt="Meme Background Image" className="img-meme" />
+        <img src={memeUrl} alt={altText + " Meme Image"} className="img-meme" />
       </div>
     </main>
   )
