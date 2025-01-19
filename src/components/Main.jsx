@@ -21,10 +21,8 @@ export default function Main() {
       .then(res => res.json())
       .then(({ data }) => {
         setMemeUrlLength(data.memes.length)
-        setMemeUrl(() => {
-          setAltText(data.memes[id].name)
-          return data.memes[id].url
-        })
+        setAltText(data.memes[id].name)
+        setMemeUrl(data.memes[id].url)
       })
   }, [id])
 
@@ -45,7 +43,7 @@ export default function Main() {
   }
 
   function randomMeme() {
-    setId(Math.floor(Math.random() * (99 - 0 + 1)) + 0)
+    setId(Math.floor(Math.random() * memeUrlLength) + 0)
   }
 
   return (
@@ -64,8 +62,8 @@ export default function Main() {
           <input id="bottom-text" className="form-input-meme" placeholder="and take my money!" type="text" name="bottom" onChange={handleChange} value={memeText.bottom} />
         </div>
         <div className="form-button-group">
-          <button onClick={previousImage}>Previous image 🖼️</button>
-          <button onClick={nextImage}>Next image 🖼️</button>
+          <button onClick={previousImage}>Previous Image 🖼️</button>
+          <button onClick={nextImage}>Next Image 🖼️</button>
           <button onClick={randomMeme}>Random Meme 🖼️</button>
         </div>
       </form>
