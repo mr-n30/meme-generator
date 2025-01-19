@@ -1,7 +1,10 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 export default function Main() {
   const [memeText, setMemeText] = useState({top: "Shut up", bottom: "and take my money!"})
+  const [memeUrl, setMemeUrl] = useState("")
+  const [id, setId] = useState(99)
+  const [memeUrlLength, setMemeUrlLength] = useState(0)
 
   function handleChange(event) {
     const {value, name} = event.currentTarget
@@ -9,6 +12,38 @@ export default function Main() {
       ...prev,
       [name]: value
     }))
+  }
+
+  // Fetch meme API
+  useEffect(function() {
+    fetch("https://api.imgflip.com/get_memes")
+      .then(res => res.json())
+      .then(data => {
+        setMemeUrlLength(data.data.memes.length)
+        return setMemeUrl(data.data.memes[id].url)
+      })
+  }, [id])
+
+  function nextImage() {
+    setId(prev => {
+      if (prev < memeUrlLength - 1)
+        return prev + 1
+      else
+        return prev
+    })
+  }
+
+  function previousImage() {
+    setId(prev => {
+      if (prev > 1)
+        return prev - 1
+      else
+        return prev
+    })
+  }
+
+  function randomMeme() {
+    setId(Math.floor(Math.random() * (99 - 1 + 1)) + 1)
   }
 
   return (
@@ -26,12 +61,16 @@ export default function Main() {
           </label>
           <input id="bottom-text" className="form-input-meme" placeholder="and take my money!" type="text" name="bottom" onChange={handleChange} value={memeText.bottom} />
         </div>
-        <button className="form-button-meme">Get a new meme image 🖼️</button>
+        <div className="form-button-group">
+          <button onClick={previousImage}>Previous image 🖼️</button>
+          <button onClick={nextImage}>Next image 🖼️</button>
+          <button onClick={randomMeme}>Random Meme 🖼️</button>
+        </div>
       </form>
       <div className="meme-image-container">
         <span className="top">{memeText.top}</span>
         <span className="bottom">{memeText.bottom}</span>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHz4zJFmNhrBqYd-tbdiw_og5CrCQcv207NQ&s" alt="Meme Background Image" className="img-meme" />
+        <img src={memeUrl} alt="Meme Background Image" className="img-meme" />
       </div>
     </main>
   )
